@@ -1,0 +1,65 @@
+name: Build AAB and publish to Google Play
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/google-play-production.yml"
+      - "app/**"
+      - "build.gradle.kts"
+      - "gradle/**"
+      - "gradle.properties"
+      - "settings.gradle.kts"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Build release AAB and upload to production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Decode Android signing key
+        run: |
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: Build signed release bundle
+        run: ./gradlew bundleRelease
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: submarine-tap-release-aab
+          path: app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+
+      - name: Publish to Google Play production
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ secrets.GOOGLE_PLAY_PACKAGE_NAME }}
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: ${{ secrets.GOOGLE_PLAY_TRACK }}
+          status: completed
