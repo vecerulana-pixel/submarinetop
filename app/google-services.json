@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1022847778833",
+    "firebase_url": "https://submarine-tap-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "submarine-tap",
+    "storage_bucket": "submarine-tap.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022847778833:android:35a4c94bcca4543d35f1b0",
+        "android_client_info": {
+          "package_name": "com.submarinewin.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxxdLZOfFJJ7dLWBjjklg8JXmfT2YPMzA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
