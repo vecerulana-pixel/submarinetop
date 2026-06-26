@@ -5,5 +5,10 @@ local.properties
 */build/
 *.apk
 *.aab
+*.jks
+*.keystore
+*.p12
+play-service-account*.json
+service-account*.json
 
 .DS_Store
